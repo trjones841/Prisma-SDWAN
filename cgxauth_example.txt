@@ -1,0 +1,26 @@
+'''
+This is an exmaple of the cgxauth.py file that is used in the other scripts. This script will return the object sdk.
+
+Other ways to accomplish this, or if can be include in primary script, however, I've built in this way to be able to
+prevent the token from appearing in files being pushed to github.
+-tj
+'''
+from cloudgenix import API
+
+mytoken = 'PASTE TOKEN HERE'
+
+def auth_session():
+
+    try:
+        sdk = API(update_check=False)
+        if (sdk.interactive.use_token(token=mytoken,client_login=True,client='None')) == True:
+            auth_response = 'Auth was successful'
+
+    except:
+        auth_response = 'There was an authentication failure'
+
+    return sdk
+
+
+if __name__ == '__main__':
+    print(auth_session())
