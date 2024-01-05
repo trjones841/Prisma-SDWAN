@@ -103,6 +103,37 @@ if __name__ == '__main__':
     except:
         print('Error occurred in the interface section')
 
+        # Get network policies
+        try:
+            network_policies_dict = sdk.get.networkpolicysets()
+            network_policies = match_items_by_key(network_policies_dict.json(), 'id', '')
+            if PRINT == True:
+                print('network policies: \n', json.dumps(network_policies_dict.json(), indent=4))
+
+            if WRITE_TO_FILE == True:
+                with open(filename, 'a') as f:
+                    f.write('***** network policies **********\n')
+
+            for item in network_policies:
+                network_policy_rules = sdk.get.networkpolicyrules(networkpolicyset_id=item['id'])
+                if PRINT == True:
+                    print(item['name'])
+                    print('\n', json.dumps(network_policy_rules.json(), indent=4))
+
+                if WRITE_TO_FILE == True:
+                    with open(filename, 'a') as f:
+                        f.write('***** ' + item['name'] + '**********\n')
+                        f.write(json.dumps(network_policy_rules.json(), indent=4))
+                        f.write('\n')
+
+            if WRITE_TO_FILE == True:
+                with open(filename, 'a') as f:
+                    f.write(
+                        '\n***********************************************************************************************************************\n\n')
+
+        except:
+            print('Error occurred in network policies section', network_policy_rules.json())
+
 
     # Returns the Service & DC Groups info along with the custom endpoint info
     # Capture only the endpoints that are customer (ie - not auto-generated for Prisma Access)
@@ -128,7 +159,7 @@ if __name__ == '__main__':
                 f.write('\n***********************************************************************************************************************\n\n')
                 f.write('\n')
                 f.write('***** serviceendpoints **********\n')
-                f.write(json.dumps(serviceendpoints_dict.json(), indent=4))
+                f.write(json.dumps(custom_serviceendpoints, indent=4))
                 f.write('\n***********************************************************************************************************************\n\n')
                 f.write('\n')
                 f.write('***** servicebindingmaps **********\n')
@@ -205,7 +236,9 @@ if __name__ == '__main__':
                     f.write(json.dumps(routing_routemaps.json(), indent=4))
                     f.write('***** bgp configs **********\n')
                     f.write(json.dumps(bgp_configs.json(), indent=4))
-                    f.write('\n***********************************************************************************************************************\n\n')
+
+        if WRITE_TO_FILE == True:
+            f.write('\n***********************************************************************************************************************\n\n')
 
     except:
         print('Error occurred in the routing section: \n', bgp_configs.json(), '\n', routing_routemaps.json())
